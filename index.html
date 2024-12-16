@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>도박 시뮬레이션</title>
+    <title>도박 게임</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,84 +11,128 @@
             text-align: center;
             padding: 20px;
         }
-        #money {
-            font-size: 2em;
-            margin: 20px 0;
-        }
-        #bet-btn {
+        #money, #bet {
             font-size: 1.5em;
+            margin: 10px 0;
+        }
+        button {
+            font-size: 1em;
             padding: 10px 20px;
-            color: white;
-            background-color: #007bff;
+            margin: 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        #bet-btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+        .win {
+            background-color: #28a745;
+            color: white;
         }
-        #result {
-            margin: 20px 0;
-            font-size: 1.2em;
+        .lose {
+            background-color: #dc3545;
+            color: white;
         }
-        #history {
-            margin-top: 20px;
-            text-align: left;
-            font-size: 1em;
-            color: #333;
+        .random, .history {
+            background-color: #007bff;
+            color: white;
+        }
+        .random:hover, .history:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <h1>도박 시뮬레이션</h1>
-    <div id="money">💰 현재 돈: 1000원</div>
-    <button id="bet-btn">도박하기</button>
-    <div id="result"></div>
-    <div id="history">
-        <h3>도박 기록</h3>
-        <ul id="history-list"></ul>
-    </div>
+    <h1>도박 게임</h1>
+    <div id="money">💰 현재 재산: 6400만 원</div>
+    <div id="bet">📉 배팅 금액: 3200만 원</div>
+    
+    <button class="win" id="win-btn">승리 (+6400만 원)</button>
+    <button class="lose" id="lose-btn">패배 (-3200만 원)</button>
+    <button class="random" id="random-btn">랜덤 결과 (50% 확률)</button>
+    <button class="random" id="random-100-btn">랜덤 100번 실행</button>
+    <button class="history" id="history-btn">전적 보기</button>
 
     <script>
-        let money = 1000;
+        let money = 64000000; // 초기 재산 설정 (6400만 원)
+        let wins = 0; // 승리 횟수
+        let losses = 0; // 패배 횟수
 
         const moneyDisplay = document.getElementById('money');
-        const resultDisplay = document.getElementById('result');
-        const betButton = document.getElementById('bet-btn');
-        const historyList = document.getElementById('history-list');
+        const betDisplay = document.getElementById('bet');
+        const winBtn = document.getElementById('win-btn');
+        const loseBtn = document.getElementById('lose-btn');
+        const randomBtn = document.getElementById('random-btn');
+        const random100Btn = document.getElementById('random-100-btn');
+        const historyBtn = document.getElementById('history-btn');
 
-        betButton.addEventListener('click', () => {
-            if (money <= 0) return; // 돈이 없으면 도박 종료
-
-            let bet = Math.floor(money / 2); // 배팅 금액은 전재산의 50%
-            let win = Math.random() < 0.5; // 승률 50%
-            let change; // 잃거나 얻은 금액
-
-            if (win) {
-                change = bet; // 승리 시 배팅 금액 2배
-                money += bet;
-                resultDisplay.textContent = `🎉 이겼습니다! 배팅금: ${bet}원, 획득: ${change}원`;
+        // 금액을 단위로 변환하는 함수
+        function formatMoney(amount) {
+            if (amount >= 1e12) {
+                return (amount / 1e12).toFixed(2) + "조 원";
+            } else if (amount >= 1e8) {
+                return (amount / 1e8).toFixed(2) + "억 원";
+            } else if (amount >= 1e4) {
+                return (amount / 1e4).toFixed(2) + "만 원";
             } else {
-                change = -bet; // 패배 시 배팅 금액 잃음
-                money -= bet;
-                resultDisplay.textContent = `💔 졌습니다. 배팅금: ${bet}원, 손실: ${-change}원`;
+                return amount + "원";
             }
+        }
 
-            // 돈 표시 업데이트
-            moneyDisplay.textContent = `💰 현재 돈: ${money}원`;
+        // 현재 재산 및 배팅 금액 업데이트
+        function updateDisplay() {
+            const betAmount = Math.floor(money / 2); // 배팅 금액은 재산의 50%
+            moneyDisplay.textContent = `💰 현재 재산: ${formatMoney(money)}`;
+            betDisplay.textContent = `📉 배팅 금액: ${formatMoney(betAmount)}`;
+            winBtn.textContent = `승리 (+${formatMoney(betAmount * 2)})`;
+            loseBtn.textContent = `패배 (-${formatMoney(betAmount)})`;
+        }
 
-            // 기록 추가
-            const listItem = document.createElement('li');
-            listItem.textContent = `배팅금: ${bet}원, 결과: ${win ? "승리" : "패배"}, ${win ? `+${change}원` : `${change}원`} → 남은 돈: ${money}원`;
-            historyList.appendChild(listItem);
+        // 승리 시
+        function handleWin() {
+            const betAmount = Math.floor(money / 2);
+            money += betAmount * 2; // 배팅 금액의 2배를 얻음
+            wins++;
+            updateDisplay();
+        }
 
-            // 돈이 0원이 되면 버튼 비활성화
-            if (money <= 0) {
-                resultDisplay.textContent += " 게임이 종료되었습니다. 돈이 없습니다!";
-                betButton.disabled = true;
+        // 패배 시
+        function handleLoss() {
+            const betAmount = Math.floor(money / 2);
+            money -= betAmount; // 배팅 금액을 잃음
+            losses++;
+            if (money < 0) money = 0; // 재산이 음수가 되지 않도록
+            updateDisplay();
+        }
+
+        // 랜덤 결과
+        function handleRandom() {
+            if (Math.random() < 0.5) {
+                handleWin();
+            } else {
+                handleLoss();
             }
-        });
+        }
+
+        // 랜덤 100번 실행
+        function handleRandom100() {
+            for (let i = 0; i < 100; i++) {
+                handleRandom();
+            }
+        }
+
+        // 전적 보기
+        function showHistory() {
+            alert(`전적: \n승리: ${wins}번\n패배: ${losses}번`);
+        }
+
+        // 이벤트 리스너 추가
+        winBtn.addEventListener('click', handleWin);
+        loseBtn.addEventListener('click', handleLoss);
+        randomBtn.addEventListener('click', handleRandom);
+        random100Btn.addEventListener('click', handleRandom100);
+        historyBtn.addEventListener('click', showHistory);
+
+        // 초기 상태 업데이트
+        updateDisplay();
     </script>
 </body>
 </html>
