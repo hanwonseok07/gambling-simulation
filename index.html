@@ -45,7 +45,7 @@
     <div id="money">💰 현재 재산: 6400만 원</div>
     <div id="bet">📉 배팅 금액: 3200만 원</div>
     
-    <button class="win" id="win-btn">승리 (+6400만 원)</button>
+    <button class="win" id="win-btn">승리 (+3200만 원)</button>
     <button class="lose" id="lose-btn">패배 (-3200만 원)</button>
     <button class="random" id="random-btn">랜덤 결과 (50% 확률)</button>
     <button class="random" id="random-100-btn">랜덤 100번 실행</button>
@@ -82,14 +82,14 @@
             const betAmount = Math.floor(money / 2); // 배팅 금액은 재산의 50%
             moneyDisplay.textContent = `💰 현재 재산: ${formatMoney(money)}`;
             betDisplay.textContent = `📉 배팅 금액: ${formatMoney(betAmount)}`;
-            winBtn.textContent = `승리 (+${formatMoney(betAmount * 2)})`;
+            winBtn.textContent = `승리 (+${formatMoney(betAmount)})`;
             loseBtn.textContent = `패배 (-${formatMoney(betAmount)})`;
         }
 
         // 승리 시
         function handleWin() {
             const betAmount = Math.floor(money / 2);
-            money += betAmount * 2; // 배팅 금액의 2배를 얻음
+            money += betAmount; // 재산 = 기존 재산 + 배팅 금액
             wins++;
             updateDisplay();
         }
@@ -97,7 +97,7 @@
         // 패배 시
         function handleLoss() {
             const betAmount = Math.floor(money / 2);
-            money -= betAmount; // 배팅 금액을 잃음
+            money -= betAmount; // 재산 = 기존 재산 - 배팅 금액
             losses++;
             if (money < 0) money = 0; // 재산이 음수가 되지 않도록
             updateDisplay();
