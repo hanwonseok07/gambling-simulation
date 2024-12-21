@@ -31,38 +31,70 @@
             background-color: #dc3545;
             color: white;
         }
-        .random, .history {
+        .bonus-btn {
+            background-color: #f4f4f9;
+            color: transparent;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .bonus-win {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .bonus-lose {
+            background-color: #ffc107;
+            color: white;
+        }
+        .history {
             background-color: #007bff;
             color: white;
         }
-        .random:hover, .history:hover {
+        .history:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <h1>도박 게임</h1>
-    <div id="money">💰 현재 재산: 6400만 원</div>
-    <div id="bet">📉 배팅 금액: 3200만 원</div>
-    
-    <button class="win" id="win-btn">승리 (+3200만 원)</button>
-    <button class="lose" id="lose-btn">패배 (-3200만 원)</button>
-    <button class="random" id="random-btn">랜덤 결과 (50% 확률)</button>
-    <button class="random" id="random-100-btn">랜덤 100번 실행</button>
+    <div class="start-money">
+        <label for="start-money">시작 금액 선택: </label>
+        <select id="start-money">
+            <option value="1000000000">10억 원</option>
+            <option value="500000000">5억 원</option>
+            <option value="250000000">2억 5천만 원</option>
+            <option value="0">0 원</option>
+        </select>
+    </div>
+
+    <div id="money">💰 현재 재산: 0 원</div>
+    <div id="bet">📉 배팅 금액: 0 원</div>
+
+    <button class="win" id="win-btn">승리 (+배팅 금액)</button>
+    <button class="lose" id="lose-btn">패배 (-배팅 금액)</button>
+
+    <button class="bonus-btn" id="bonus-btn">보너스 도박 버튼</button>
+    <button class="bonus-win" id="bonus-win-btn" style="display:none;">보너스 승리 (+배팅 금액의 2.8배)</button>
+    <button class="bonus-lose" id="bonus-lose-btn" style="display:none;">보너스 패배 (-배팅 금액의 1.4배)</button>
+
     <button class="history" id="history-btn">전적 보기</button>
 
     <script>
-        let money = 64000000; // 초기 재산 설정 (6400만 원)
-        let wins = 0; // 승리 횟수
-        let losses = 0; // 패배 횟수
+        let money = 0; 
+        let wins = 0; 
+        let losses = 0; 
+        let bonusWins = 0; 
+        let bonusLosses = 0; 
 
         const moneyDisplay = document.getElementById('money');
         const betDisplay = document.getElementById('bet');
         const winBtn = document.getElementById('win-btn');
         const loseBtn = document.getElementById('lose-btn');
-        const randomBtn = document.getElementById('random-btn');
-        const random100Btn = document.getElementById('random-100-btn');
+        const bonusBtn = document.getElementById('bonus-btn');
+        const bonusWinBtn = document.getElementById('bonus-win-btn');
+        const bonusLoseBtn = document.getElementById('bonus-lose-btn');
         const historyBtn = document.getElementById('history-btn');
+        const startMoneySelect = document.getElementById('start-money');
 
         // 금액을 단위로 변환하는 함수
         function formatMoney(amount) {
@@ -79,56 +111,76 @@
 
         // 현재 재산 및 배팅 금액 업데이트
         function updateDisplay() {
-            const betAmount = Math.floor(money / 2); // 배팅 금액은 재산의 50%
+            const betAmount = Math.floor(money * 0.5); // 배팅 금액 = 현재 자산의 50%
             moneyDisplay.textContent = `💰 현재 재산: ${formatMoney(money)}`;
             betDisplay.textContent = `📉 배팅 금액: ${formatMoney(betAmount)}`;
             winBtn.textContent = `승리 (+${formatMoney(betAmount)})`;
             loseBtn.textContent = `패배 (-${formatMoney(betAmount)})`;
+            bonusWinBtn.textContent = `보너스 승리 (+${formatMoney(betAmount * 2.8)})`;
+            bonusLoseBtn.textContent = `보너스 패배 (-${formatMoney(betAmount * 1.4)})`;
         }
 
         // 승리 시
         function handleWin() {
-            const betAmount = Math.floor(money / 2);
-            money += betAmount; // 재산 = 기존 재산 + 배팅 금액
+            const betAmount = Math.floor(money * 0.5);
+            money += betAmount; 
             wins++;
             updateDisplay();
         }
 
         // 패배 시
         function handleLoss() {
-            const betAmount = Math.floor(money / 2);
-            money -= betAmount; // 재산 = 기존 재산 - 배팅 금액
+            const betAmount = Math.floor(money * 0.5);
+            money -= betAmount; 
+            if (money < 0) money = 0; 
             losses++;
-            if (money < 0) money = 0; // 재산이 음수가 되지 않도록
             updateDisplay();
         }
 
-        // 랜덤 결과
-        function handleRandom() {
-            if (Math.random() < 0.5) {
-                handleWin();
-            } else {
-                handleLoss();
-            }
+        // 보너스 승리 시
+        function handleBonusWin() {
+            const betAmount = Math.floor(money * 0.5); 
+            money += betAmount * 2.8; 
+            bonusWins++;
+            updateDisplay();
         }
 
-        // 랜덤 100번 실행
-        function handleRandom100() {
-            for (let i = 0; i < 100; i++) {
-                handleRandom();
-            }
+        // 보너스 패배 시
+        function handleBonusLoss() {
+            const betAmount = Math.floor(money * 0.5); 
+            money -= betAmount * 1.4; 
+            if (money < 0) money = 0; 
+            bonusLosses++;
+            updateDisplay();
         }
 
         // 전적 보기
         function showHistory() {
-            alert(`전적: \n승리: ${wins}번\n패배: ${losses}번`);
+            alert(`전적: \n승리: ${wins}번\n패배: ${losses}번\n보너스 승리: ${bonusWins}번\n보너스 패배: ${bonusLosses}번`);
         }
+
+        // 시작 금액 선택 시
+        startMoneySelect.addEventListener('change', () => {
+            money = parseInt(startMoneySelect.value);
+            wins = 0;
+            losses = 0;
+            bonusWins = 0;
+            bonusLosses = 0;
+            updateDisplay();
+        });
+
+        // 보너스 도박 버튼 클릭 시 보너스 승리/패배 버튼 표시
+        bonusBtn.addEventListener('click', () => {
+            bonusWinBtn.style.display = 'inline-block';
+            bonusLoseBtn.style.display = 'inline-block';
+            bonusBtn.style.display = 'none'; 
+        });
 
         // 이벤트 리스너 추가
         winBtn.addEventListener('click', handleWin);
         loseBtn.addEventListener('click', handleLoss);
-        randomBtn.addEventListener('click', handleRandom);
-        random100Btn.addEventListener('click', handleRandom100);
+        bonusWinBtn.addEventListener('click', handleBonusWin);
+        bonusLoseBtn.addEventListener('click', handleBonusLoss);
         historyBtn.addEventListener('click', showHistory);
 
         // 초기 상태 업데이트
