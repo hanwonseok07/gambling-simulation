@@ -74,8 +74,8 @@
     <button class="lose" id="lose-btn">패배 (-배팅 금액)</button>
 
     <button class="bonus-btn" id="bonus-btn">보너스 도박 버튼</button>
-    <button class="bonus-win" id="bonus-win-btn" style="display:none;">보너스 승리 (+배팅 금액의 2.8배)</button>
-    <button class="bonus-lose" id="bonus-lose-btn" style="display:none;">보너스 패배 (-배팅 금액의 1.4배)</button>
+    <button class="bonus-win" id="bonus-win-btn" style="display:none;">70% 승리 (+배팅 금액의 2.8배)</button>
+    <button class="bonus-lose" id="bonus-lose-btn" style="display:none;">70% 패배 (-배팅 금액의 1.4배)</button>
 
     <button class="history" id="history-btn">전적 보기</button>
 
@@ -116,8 +116,8 @@
             betDisplay.textContent = `📉 배팅 금액: ${formatMoney(betAmount)}`;
             winBtn.textContent = `승리 (+${formatMoney(betAmount)})`;
             loseBtn.textContent = `패배 (-${formatMoney(betAmount)})`;
-            bonusWinBtn.textContent = `보너스 승리 (+${formatMoney(betAmount * 1.4)})`;
-            bonusLoseBtn.textContent = `보너스 패배 (-${formatMoney(betAmount * 1.4)})`;
+            bonusWinBtn.textContent = `70% 승리 (+${formatMoney(betAmount * 1.4)})`;
+            bonusLoseBtn.textContent = `70% 패배 (-${formatMoney(betAmount * 1.4)})`;
         }
 
         // 승리 시
@@ -156,7 +156,7 @@
 
         // 전적 보기
         function showHistory() {
-            alert(`전적: \n승리: ${wins}번\n패배: ${losses}번\n보너스 승리: ${bonusWins}번\n보너스 패배: ${bonusLosses}번`);
+            alert(`전적: \n승리: ${wins}번\n패배: ${losses}번\n70% 승리: ${bonusWins}번\n70% 패배: ${bonusLosses}번`);
         }
 
         // 시작 금액 선택 시
