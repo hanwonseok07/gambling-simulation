@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>도박 게임</title>
+    <title>금액 계산기</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -56,7 +56,7 @@
     </style>
 </head>
 <body>
-    <h1>도박 게임</h1>
+    <h1>금액 계산기</h1>
     <div class="start-money">
         <label for="start-money">시작 금액 선택: </label>
         <select id="start-money">
@@ -116,7 +116,7 @@
             betDisplay.textContent = `📉 배팅 금액: ${formatMoney(betAmount)}`;
             winBtn.textContent = `승리 (+${formatMoney(betAmount)})`;
             loseBtn.textContent = `패배 (-${formatMoney(betAmount)})`;
-            bonusWinBtn.textContent = `보너스 승리 (+${formatMoney(betAmount * 4.2)})`;
+            bonusWinBtn.textContent = `보너스 승리 (+${formatMoney(betAmount * 1.4)})`;
             bonusLoseBtn.textContent = `보너스 패배 (-${formatMoney(betAmount * 1.4)})`;
         }
 
@@ -140,7 +140,7 @@
         // 보너스 승리 시
         function handleBonusWin() {
             const betAmount = Math.floor(money * 0.5); 
-            money += betAmount * 4.2; 
+            money += betAmount * 1.4; 
             bonusWins++;
             updateDisplay();
         }
